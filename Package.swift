@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.5
 
 // Copyright The swift-url Contributors.
 //
@@ -37,7 +37,6 @@ let package = Package(
     // These libraries expose some convenient hooks for testing, benchmarking, and other tools
     // - either in this repo or at <https://github.com/karwa/swift-url-tools>.
     .library(name: "_WebURLIDNA", targets: ["IDNA"]),
-    .library(name: "_WebURLTestSupport", targets: ["WebURLTestSupport"]),
 
   ],
   dependencies: [
@@ -46,11 +45,6 @@ let package = Package(
     // ================
     // WebURLSystemExtras supports swift-system 1.0+.
     .package(url: "https://github.com/apple/swift-system.git", .upToNextMajor(from: "1.0.0")),
-
-    // 🧪 Test-Only Dependencies.
-    // ==========================
-    // Checkit - Exercises for stdlib protocol conformances.
-    .package(name: "Checkit", url: "https://github.com/karwa/swift-checkit.git", from: "0.0.2"),
 
   ],
   targets: [
@@ -62,19 +56,10 @@ let package = Package(
       name: "UnicodeDataStructures",
       swiftSettings: [.define("WEBURL_UNICODE_PARSE_N_PRINT", .when(configuration: .debug))]
     ),
-    .testTarget(
-      name: "UnicodeDataStructuresTests",
-      dependencies: ["UnicodeDataStructures"],
-      resources: [.copy("GenerateData/TableDefinitions")]
-    ),
 
     .target(
       name: "IDNA",
       dependencies: ["UnicodeDataStructures"]
-    ),
-    .testTarget(
-      name: "IDNATests",
-      dependencies: ["IDNA", "WebURLTestSupport"]
     ),
 
     // 🌐 WebURL.
@@ -82,21 +67,7 @@ let package = Package(
 
     .target(
       name: "WebURL",
-      dependencies: ["IDNA"],
-      exclude: ["WebURL.docc"]
-    ),
-    .target(
-      name: "WebURLTestSupport",
-      dependencies: ["WebURL", "IDNA"],
-      resources: [.copy("TestFilesData")]
-    ),
-    .testTarget(
-      name: "WebURLTests",
-      dependencies: ["WebURL", "WebURLTestSupport", "Checkit"]
-    ),
-    .testTarget(
-      name: "WebURLDeprecatedAPITests",
-      dependencies: ["WebURL"]
+      dependencies: ["IDNA"]
     ),
 
     // 🔗 WebURLSystemExtras.
@@ -106,10 +77,6 @@ let package = Package(
       name: "WebURLSystemExtras",
       dependencies: ["WebURL", .product(name: "SystemPackage", package: "swift-system")]
     ),
-    .testTarget(
-      name: "WebURLSystemExtrasTests",
-      dependencies: ["WebURLSystemExtras", "WebURL", .product(name: "SystemPackage", package: "swift-system")]
-    ),
 
     // 🔗 WebURLFoundationExtras.
     // ==========================
@@ -117,15 +84,6 @@ let package = Package(
     .target(
       name: "WebURLFoundationExtras",
       dependencies: ["WebURL"]
-    ),
-    .testTarget(
-      name: "WebURLFoundationExtrasTests",
-      dependencies: ["WebURLFoundationExtras", "WebURLTestSupport", "WebURL"],
-      resources: [.copy("URLConversion/Resources")]
-    ),
-    .testTarget(
-      name: "WebURLFoundationEndToEndTests",
-      dependencies: ["WebURLFoundationExtras", "WebURL"]
     ),
   ]
 )
